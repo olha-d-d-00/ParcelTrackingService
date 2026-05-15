@@ -178,5 +178,3 @@ Django admin is available at:
 ```text
 http://127.0.0.1:8000/admin/
 ```
-
-# ParcelTrackingService
