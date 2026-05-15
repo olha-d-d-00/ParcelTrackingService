@@ -211,6 +211,7 @@ ParcelTrackingService/
 │
 ├── config/
 ├── parcels/
+├── SQL_ANSWERS
 ├── requirements.txt
 ├── Dockerfile
 ├── docker-compose.yml
@@ -218,3 +219,5 @@ ParcelTrackingService/
 └── README.md
 ```
 
+Additional SQL tasks:
+SQL_ANSWERS/sql_tasks_answers.docx
