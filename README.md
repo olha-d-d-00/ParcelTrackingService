@@ -1,6 +1,5 @@
 Parcel Tracking API
-
-Simple Django REST Framework API for creating parcels, tracking parcel status, and viewing parcel movement history by tracking number.
+Simple Django REST Framework API for creating parcels, updating parcel statuses, and tracking parcel delivery history by tracking number.
 
 1. Tech Stack
 
@@ -8,52 +7,70 @@ Simple Django REST Framework API for creating parcels, tracking parcel status, a
 - Django
 - Django REST Framework
 - SQLite
-- Docker / Docker Compose
+- Docker
+- Docker Compose
 
-2. Run locally
+
+2. Run Locally
+Create virtual environment and install dependencies:
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-python manage.py migrate
-python manage.py runserver
 ````
 
-Base URL:
+Apply migrations:
+
+```bash
+python manage.py migrate
+```
+
+Run development server:
+
+```bash
+python manage.py runserver 8001
+```
+
+Local Base URL:
 
 ```text
-http://127.0.0.1:8000/api/
+http://127.0.0.1:8001/api/
 ```
 
 3. Run with Docker
-
+Build and start containers:
 ```bash
 docker compose up --build
 ```
 
-Base URL with Docker:
-
+Docker Base URL:
 ```text
 http://127.0.0.1:8002/api/
 ```
 
-4. Tests
+Stop containers:
+```bash
+docker compose down
+```
+
+
+
+4. Run Tests
 
 ```bash
 python manage.py test
 ```
 
+---
+
 5. API Endpoints
-
-5.1. Post Offices
-
-Create post office:
-
+5.1 Post Offices
+Create post office
 ```http
 POST /api/offices/
 ```
-
+Request example:
 ```json
 {
   "number": 1,
@@ -62,20 +79,21 @@ POST /api/offices/
   "postal_code": "01001"
 }
 ```
-
-Get post offices:
-
+Get all post offices
 ```http
 GET /api/offices/
 ```
 
-5.2. Parcels
+---
 
-Create parcel:
+5.2 Parcels
 
+Create parcel
 ```http
 POST /api/parcels/
 ```
+
+Request example:
 
 ```json
 {
@@ -92,89 +110,111 @@ POST /api/parcels/
 
 The tracking number is generated automatically and returned in the response.
 
-Get parcels:
+---
+
+Get all parcels
 
 ```http
 GET /api/parcels/
 ```
 
-Filter parcels:
+---
 
-```http
+Filter parcels
+
+Filter by status and sender city:
 GET /api/parcels/?status=in_transit&from_city=Kyiv
-```
 
-Get parcel details with status history:
 
-```http
+Get parcel details by tracking number
 GET /api/parcels/{tracking_number}/
-```
+
 
 Example:
-
-```http
 GET /api/parcels/TRK77C8FE2E45/
-```
+The response contains parcel details and full status history.
 
-5.3 Update parcel status
 
-```http
+5.3 Update Parcel Status
+Update parcel status
 POST /api/parcels/{tracking_number}/status/
-```
 
-```json
+Request example:
 {
   "status": "accepted",
   "office": 1,
   "comment": "Parcel accepted at sender office"
 }
-```
+
+
+
 
 Allowed statuses:
+created
+accepted
+in_transit
+arrived
+delivered
+returned
 
-```text
-created, accepted, in_transit, arrived, delivered, returned
-```
 
-Example status flow:
-
-```text
+Example status flow
 created -> accepted -> in_transit -> arrived -> delivered
-```
+
 
 Alternative flow:
-
-```text
 created -> accepted -> in_transit -> returned
-```
 
-5.4. Parcels in post office
 
-Returns parcels that are currently in a specific destination office with `arrived` status.
 
-```http
+5.4 Parcels in Post Office
+Returns parcels that are currently located in a specific destination office.
+Conditions:
+- parcel status must be `arrived`
+- destination office must match requested office id
 GET /api/offices/{id}/parcels/
-```
 
 Example:
-
-```http
 GET /api/offices/2/parcels/
-```
+
+
 
 6. Business Rules
 
-* A parcel cannot be delivered before it has arrived at the destination office.
-* Terminal statuses `delivered` and `returned` cannot be changed.
-* Weight must be greater than `0` and not more than `30` kg.
-* Declared value cannot be negative.
-* Sender office and destination office must be different.
-* Every status change automatically creates a history record.
+- A parcel cannot be delivered before it has arrived at the destination office.
+- Terminal statuses `delivered` and `returned` cannot be changed.
+- Weight must be greater than `0` and not more than `30` kg.
+- Declared value cannot be negative.
+- Sender office and destination office must be different. 
+- Every status change automatically creates a history record.
 
-6.1. Admin
+
+
+7. Django Admin
 
 Django admin is available at:
 
+Local:
+http://127.0.0.1:8001/admin/
+
+
+Docker:
+http://127.0.0.1:8002/admin/
+
+
+---
+
+8. Project Structure
+
 ```text
-http://127.0.0.1:8000/admin/
+ParcelTrackingService/
+│
+├── config/
+├── parcels/
+├── requirements.txt
+├── Dockerfile
+├── docker-compose.yml
+├── manage.py
+└── README.md
 ```
+
